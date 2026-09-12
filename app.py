@@ -112,6 +112,7 @@ class MistralProvider:
             'Link to supplied repository URLs when discussing projects. '
             'You cannot execute actions, browse, or send messages.\n'
             'PUBLIC PORTFOLIO FACTS:\n'+json.dumps(context,ensure_ascii=False))
+        return system
         if self.client is None:
             self.client=httpx.Client(timeout=httpx.Timeout(25,connect=5))
         response=self.client.post('https://api.mistral.ai/v1/chat/completions',
@@ -175,10 +176,15 @@ def create_app(config=None):
     def http_error(error):
         return jsonify(error=error.name), error.code
 
-    @app.get('/')
-    def root(): 
-        github=GitHubRepositories(os.getenv('GITHUB_USERNAME','lackMoon'),os.getenv('GITHUB_TOKEN',''))
-        return jsonify(github.snapshot())
+    # @app.get('/')
+    # def root(): 
+    #     github=GitHubRepositories(os.getenv('GITHUB_USERNAME','lackMoon'),os.getenv('GITHUB_TOKEN',''))
+    #     snapshot=github.snapshot()
+    #     repos=snapshot['repositories']
+    #     context={k:v for k,v in snapshot.items() if k!='repositories'}
+    #     context.update(repository_names=[r['name'] for r in repos],selected_repositories=selected,
+    #                     detail_selection_limit=15,source=f'https://github.com/{self.github.username}' if hasattr(self.github,'username') else 'GitHub')
+    #     return jsonify(github.snapshot())
 
     @app.get('/healthz')
     def health(): return jsonify(status='ok')
