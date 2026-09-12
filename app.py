@@ -112,7 +112,6 @@ class MistralProvider:
             'Link to supplied repository URLs when discussing projects. '
             'You cannot execute actions, browse, or send messages.\n'
             'PUBLIC PORTFOLIO FACTS:\n'+json.dumps(context,ensure_ascii=False))
-        return system
         if self.client is None:
             self.client=httpx.Client(timeout=httpx.Timeout(25,connect=5))
         response=self.client.post('https://api.mistral.ai/v1/chat/completions',
@@ -120,6 +119,7 @@ class MistralProvider:
             json={'model':self.model,'messages':[{'role':'system','content':system},*history,
                   {'role':'user','content':message}],'max_tokens':600,'temperature':0.3,'stream':False})
         response.raise_for_status()
+        return response
         try:
             reply=response.json()['choices'][0]['message']['content']
             if isinstance(reply,list):
