@@ -88,7 +88,6 @@ class MistralProvider:
         snapshot=self.github.snapshot()
         # Bound context size while retaining a list of names for broader discovery.
         repos=snapshot['repositories']
-        app.logger.info(repos)
         query=' '.join([item['content'] for item in history[-2:]]+[message]).lower()
         terms=set(re.findall(r'[\w.+-]+',query))
         def score(repo):
@@ -119,7 +118,6 @@ class MistralProvider:
             headers={'Authorization':'Bearer '+self.key,'Content-Type':'application/json'},
             json={'model':self.model,'messages':[{'role':'system','content':system},*history,
                   {'role':'user','content':message}],'max_tokens':600,'temperature':0.3,'stream':False})
-        app.logger.info(response)
         response.raise_for_status()
         try:
             reply=response.json()['choices'][0]['message']['content']
@@ -176,6 +174,11 @@ def create_app(config=None):
     @app.errorhandler(HTTPException)
     def http_error(error):
         return jsonify(error=error.name), error.code
+
+    @app.get('/')
+    def root(): 
+        github=GitHubRepositories(os.getenv('GITHUB_USERNAME','lackMoon'),os.getenv('GITHUB_TOKEN',''))
+        return jsonify(github.snapshot())
 
     @app.get('/healthz')
     def health(): return jsonify(status='ok')
