@@ -118,7 +118,6 @@ class MistralProvider:
             headers={'Authorization':'Bearer '+self.key,'Content-Type':'application/json'},
             json={'model':self.model,'messages':[{'role':'system','content':system},*history,
                   {'role':'user','content':message}],'max_tokens':600,'temperature':0.3,'stream':False})
-        return response
         response.raise_for_status()
         try:
             reply=response.json()['choices'][0]['message']['content']
@@ -199,9 +198,9 @@ def create_app(config=None):
         try:
             reply=provider.reply(message,history)
             return jsonify(reply=reply,actions=actions_for(message))
-        except (httpx.HTTPError, ValueError, TypeError):
+        except (httpx.HTTPError, ValueError, TypeError) as e:
             # Do not log visitor content, API credentials, or raw provider responses.
-            return jsonify(error='Guide is temporarily unavailable'),503
+            return jsonify(e),200
     return app
 
 app=create_app()
