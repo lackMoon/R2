@@ -88,6 +88,7 @@ class MistralProvider:
         snapshot=self.github.snapshot()
         # Bound context size while retaining a list of names for broader discovery.
         repos=snapshot['repositories']
+        app.logger.info(repos)
         query=' '.join([item['content'] for item in history[-2:]]+[message]).lower()
         terms=set(re.findall(r'[\w.+-]+',query))
         def score(repo):
