@@ -198,9 +198,9 @@ def create_app(config=None):
         try:
             reply=provider.reply(message,history)
             return jsonify(reply=reply,actions=actions_for(message))
-        except (httpx.HTTPError, ValueError, TypeError) as e:
+        except (httpx.HTTPError, ValueError, TypeError):
             # Do not log visitor content, API credentials, or raw provider responses.
-            return jsonify(e),200
+            return jsonify(error='Guide is temporarily unavailable'),503
     return app
 
 app=create_app()
