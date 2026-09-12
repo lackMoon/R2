@@ -119,6 +119,7 @@ class MistralProvider:
             headers={'Authorization':'Bearer '+self.key,'Content-Type':'application/json'},
             json={'model':self.model,'messages':[{'role':'system','content':system},*history,
                   {'role':'user','content':message}],'max_tokens':600,'temperature':0.3,'stream':False})
+        app.logger.info(response)
         response.raise_for_status()
         try:
             reply=response.json()['choices'][0]['message']['content']
